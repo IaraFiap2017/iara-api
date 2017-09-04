@@ -90,35 +90,50 @@ var iara = watson.conversation({
   version_date: '2017-05-26'
 });
 
+var apiKey = 'HeD_ea9KW8_PUHJuJRepwM62gLqwxJ8r';
 var context = {};
 
 function trataMensagem(event) {
   console.log("Mensagem recebida com sucesso");
   
-  var recipientId = event.recipient.id;
-  
-  console.log('Recipient ID :: ' + recipientId);
-  
-  iara.message({
-    workspace_id: workspace,
-    input: { 'text': event.message.text },
-    context: context
-  },
-  function(err, response){
-    if(err){
-      console.log('INFO: ', err);
-    }
-    else{
-      console.log('INFO: Iara: ' + response.output.text[0]);
-      
-      //event.sender.id
-      //sendMessageFacebook(event.recipient.id, response.output.text[0]);
-      sendMessageFacebook(event.sender.id, response.output.text[0]);
-    }
-  }); 
+  if(event.message.text.includes('perfume')){
+    request({
+      uri: 'https://api.mlab.com/api/1/databases/testeiara/collections/products?apiKey=' + apiKey
+    },
+    function (error, response, body) {
+      if (!error && response.statusCode == 200 ) {
+        console.log('Funcionou...')
+        
+        var json = JSON.parse(response.body);
+        
+        sendMessageFacebook(event.sender.id, 'Poderia ser o ' + json[0].name + ' - R$' + json[0].salePrice);
+      } else {
+        
+        console.log('Não Funcionou...')
+        console.log(response.body);
+      }
+    }); 
+  }
+  else{
+    iara.message({
+      workspace_id: workspace,
+      input: { 'text': event.message.text },
+      context: context
+    },
+    function(err, response){
+      if(err){
+        console.log('INFO: ', err);
+      }
+      else{
+        console.log('INFO: Iara: ' + response.output.text[0]);
+        sendMessageFacebook(event.sender.id, response.output.text[0]);
+      }
+    });   
+  }
 }
 
 function sendMessageFacebook(recipientId, text){
+  
   var messageData = {
         recipient: {
           id: recipientId
@@ -143,14 +158,13 @@ function sendMessageFacebook(recipientId, text){
       
       console.log(response.statusCode);
 
-      console.log("INFO: Successfully sent generic message with id %s to recipient %s", 
-        messageId, recipientId);
     } else {
       console.error(response.body.error);
     }
   });  
 }
 
+/*
 io.on('connection', function (socket) {
     messages.forEach(function (data) {
       socket.emit('message', data);
@@ -204,7 +218,7 @@ function broadcast(event, data) {
     socket.emit(event, data);
   });
 }
-
+*/
 server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
   var addr = server.address();
   console.log("Chat server listening at", addr.address + ":" + addr.port);
