@@ -119,16 +119,49 @@ function trataMensagem(event) {
         console.log('INFO: ', err);
       }
       else{
+        var respostaWatson = response.output.text[0];
           
-         
-          
-        if ()
-          
-          
+        if (respostaWatson == "#perfume"){
+            callPerfumes();
+        }
+        else if(respostaWatson == ""){
+            
+        }
+        else if(respostaWatson == ""){
+            
+        }
+        else if(respostaWatson == ""){
+            
+        }
+        else{
+            sendMessageFacebook(event.sender.id, response.output.text[0]);    
+        }
+        
         console.log('INFO: Iara: ' + response.output.text[0]);
-        sendMessageFacebook(event.sender.id, response.output.text[0]);
       }
     });   
+}
+
+function callPerfumes(){
+    request({
+      uri: 'https://api.mlab.com/api/1/databases/testeiara/collections/products?apiKey=' + apiKey
+    },
+    function (error, response, body) {
+      if (!error && response.statusCode == 200 ) {
+        console.log('Funcionou...')
+        
+        var json = JSON.parse(response.body);
+        
+        sendMessageFacebook(event.sender.id, 'Poderia ser o ' + json[0].name + ' - R$' + json[0].salePrice);
+      } else {
+        console.log('Não Funcionou...')
+        console.log(response.body);
+      }
+    }); 
+}
+
+function sendMessageFacebookWithImage(objResposta){
+    
 }
 
 function sendMessageFacebook(recipientId, text){
