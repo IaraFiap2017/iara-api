@@ -1,130 +1,169 @@
-var express = require('express');
-var bodyParser = require('body-parser');
-var watson = require('watson-developer-cloud');
+//
+// # SimpleServer
+//
+// A simple chat server using Socket.IO, Express, and Async.
+//
+var http = require('http');
+var path = require('path');
 var file = require('fs');
-var http = require("http");
+var watson = require('watson-developer-cloud');
 
-var contexid = "";
+var async = require('async');
+var socketio = require('socket.io');
+var express = require('express');
+var bodyParser = require("body-parser");
+var request = require('request')
+//
+// ## SimpleServer `SimpleServer(obj)`
+//
+// Creates a new instance of SimpleServer with the following options:
+//  * `port` - The HTTP port to listen on. If `process.env.PORT` is set, _it overrides this value_.
+//
+var router = express();
+var server = http.createServer(router);
+var io = socketio.listen(server);
+
+router.use(express.static(path.resolve(__dirname, 'client')));
+router.use(bodyParser.json());
+router.use(bodyParser.urlencoded({ extended: true }));
+
+var jsonParser = bodyParser.json();
+
+var messages = [];
+var sockets = [];
 
 var credentials = JSON.parse(file.readFileSync('credentials.json', 'utf-8'));
 
 var userName = credentials.userWatson;
 var password = credentials.passWatson;
 var workspace = credentials.workspaceId;
-var tokenFacebook = credentials.tokenFacebook;
+//var tokenFacebook = credentials.tokenFacebook;
+var tokenFacebook = 'EAAB5udtsgKsBAAeNOZCNQXAo8FbUisdZAnqRJ7fJK0QvVIXJjCXB4EoCl2mA8Wv8HUq6OP4RG4LhfE9zqkoZBxRyjZBVhfq6ZCo1NGuT5XKJA5sYRuig6zubV6CoKPHOfY7BN3idIXanUerKt8uBPTM77IMQTMVZBkOerbhF9FHKNUr43da7jpWRnrZBZAwiWEcZD';
+var token = 'projetoiarafiap';
 
-var app = express();
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-
-
-var conversation_id = "";
-var w_conversation = watson.conversation({
-    //url: 'https://gateway.watsonplatform.net/conversation/api',
-    username: process.env.CONVERSATION_USERNAME || userName,
-    password: process.env.CONVERSATION_PASSWORD || password,
-    version: 'v1',
-    version_date: '2016-07-11'
-});
-
-app.get('/webhook', function (req, res) {
-    if (req.query['hub.verify_token'] === tokenFacebook) {
+router.get('/webhook', function (req, res){
+  if (req.query['hub.verify_token'] === token) {
         res.send(req.query['hub.challenge']);
+        console.log('Validado com sucesso');
     }
     
     console.log('Token - ' + req.query['hub.verify_token']);
     res.send('Erro de validação no token.');
 });
 
-app.post('/webhook', function (req, res) {
-	var text = null;
-	
-    messaging_events = req.body.entry[0].messaging;
-	for (var i = 0; i < messaging_events.length; i++) {	
-        var event = req.body.entry[0].messaging[i];
-        var sender = event.sender.id;
-
-        if (event.message && event.message.text) {
-			text = event.message.text;
-		}else if (event.postback && !text) {
-			text = event.postback.payload;
-		}else{
-			break;
-		}
-		
-		var params = {
-			input: text,
-			// context: {"conversation_id": conversation_id}
-			context:contexid
-		};
-
-		var payload = {
-			workspace_id: workspace
-		};
-
-		if (params) {
-			if (params.input) {
-				params.input = params.input.replace("\n","");
-				payload.input = { "text": params.input };
-			}
-			if (params.context) {
-				payload.context = params.context;
-			}
-		}
-		callWatson(payload, sender);
-    }
+router.post('/webhook', jsonParser, function(req, res){
+  var data = req.body;
+  
+  console.log('INFO: Post efetuado com sucesso');
+  
+  if(data && data.object === 'page'){
+    data.entry.forEach(function (entry){
+      var pageID = entry.id;
+      var timeOfEvent = entry.time;
+      
+      if(entry.messaging){
+        
+        console.log('INFO: Mensagem existe');
+        entry.messaging.forEach(function (event){
+          if(event.message){
+            trataMensagem(event);
+          }
+        });
+      }
+      else{
+        console.log(Date.now() + ' - Sem a propriedade ENTRY');
+      }
+    });
+    
     res.sendStatus(200);
+  }
 });
 
-function callWatson(payload, sender) {
-	w_conversation.message(payload, function (err, convResults) {
-		 console.log(convResults);
-		contexid = convResults.context;
-		
-        if (err) {
-            return responseToRequest.send("Erro.");
-        }
-		
-		if(convResults.context != null)
-    	   conversation_id = convResults.context.conversation_id;
-        if(convResults != null && convResults.output != null){
-			var i = 0;
-			while(i < convResults.output.text.length){
-				sendMessage(sender, convResults.output.text[i++]);
-			}
-		}
-    });
+var iara = watson.conversation({
+  username: userName,
+  password: password,
+  version: 'v1',
+  version_date: '2017-05-26'
+});
+
+var apiKey = 'HeD_ea9KW8_PUHJuJRepwM62gLqwxJ8r';
+var context = {};
+
+function trataMensagem(event) {
+    console.log("Mensagem recebida com sucesso");
+    
+  /*if(event.message.text.includes('perfume')){
+    request({
+      uri: 'https://api.mlab.com/api/1/databases/testeiara/collections/products?apiKey=' + apiKey
+    },
+    function (error, response, body) {
+      if (!error && response.statusCode == 200 ) {
+        console.log('Funcionou...')
+        
+        var json = JSON.parse(response.body);
+        
+        sendMessageFacebook(event.sender.id, 'Poderia ser o ' + json[0].name + ' - R$' + json[0].salePrice);
+      } else {
+        console.log('Não Funcionou...')
+        console.log(response.body);
+      }
+    }); 
+  }*/
+    iara.message({
+      workspace_id: workspace,
+      input: { 'text': event.message.text },
+      context: context
+    },
+    function(err, response){
+      if(err){
+        console.log('INFO: ', err);
+      }
+      else{
+          
+         
+          
+        if ()
+          
+          
+        console.log('INFO: Iara: ' + response.output.text[0]);
+        sendMessageFacebook(event.sender.id, response.output.text[0]);
+      }
+    });   
 }
 
-function sendMessage(sender, text_) {
-	text_ = text_.substring(0, 319);
-	messageData = {	text: text_ };
-
-    request({
-        url: 'https://graph.facebook.com/v2.6/me/messages',
-        method: 'POST',
-        json: {
-            recipient: { id: sender },
-            message: messageData,
+function sendMessageFacebook(recipientId, text){
+  var messageData = {
+        recipient: {
+          id: recipientId
+        },
+        message: {
+          text: text
         }
-    }, function (error, response, body) {
-        if (error) {
-            console.log('Error sending message: ', error);
-        } else if (response.body.error) {
-            console.log('Error: ', response.body.error);
-        }
-    });
-};
+  };
+  
+  console.log('INFO: Enviando mensagem (' + messageData.message.text + ')');
+  
+  request({
+    uri: 'https://graph.facebook.com/v2.6/me/messages',
+    qs: { access_token: tokenFacebook },
+    method: 'POST',
+    json: messageData
+  },
+  function (error, response, body) {
+    if (!error /* && response.statusCode == 200 */) {
+      var recipientId = body.recipient_id;
+      var messageId = body.message_id;
+      
+      console.log(response.statusCode);
 
-console.log('Rodando..');
+    } else {
+      console.error(response.body.error);
+    }
+  });  
+}
 
-var token = credentials.tokenFacebook;
-
-var host = process.env.IP;
-var port = process.env.PORT;
-
-var server = http.createServer(app);
-
-server.listen(process.env.PORT, host, () => { 
-    console.log('Running on port ' + port + ' and IP ' + host);
+server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
+  var addr = server.address();
+  console.log("Chat server listening at", addr.address + ":" + addr.port);
 });
+
