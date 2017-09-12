@@ -91,24 +91,7 @@ var context = {};
 
 function trataMensagem(event) {
     console.log("Mensagem recebida com sucesso");
-    
-  /*if(event.message.text.includes('perfume')){
-    request({
-      uri: 'https://api.mlab.com/api/1/databases/testeiara/collections/products?apiKey=' + apiKey
-    },
-    function (error, response, body) {
-      if (!error && response.statusCode == 200 ) {
-        console.log('Funcionou...')
-        
-        var json = JSON.parse(response.body);
-        
-        sendMessageFacebook(event.sender.id, 'Poderia ser o ' + json[0].name + ' - R$' + json[0].salePrice);
-      } else {
-        console.log('Não Funcionou...')
-        console.log(response.body);
-      }
-    }); 
-  }*/
+    console.log(event.message.text);
     iara.message({
       workspace_id: workspace,
       input: { 'text': event.message.text },
@@ -117,32 +100,38 @@ function trataMensagem(event) {
     function(err, response){
       if(err){
         console.log('INFO: ', err);
+        console.log(response);
       }
       else{
         var respostaWatson = response.output.text[0];
+        console.log("Watson: " + respostaWatson);
           
-        if (respostaWatson == "#perfume"){
-            callPerfumes();
-        }
-        else if(respostaWatson == ""){
-            
-        }
-        else if(respostaWatson == ""){
-            
+        if (event.message.text.includes('perfume')){
+            console.log("Intenção: Perfume");
+            callPerfumes(event.sender.id);
         }
         else if(respostaWatson == ""){
             
         }
         else{
-            sendMessageFacebook(event.sender.id, response.output.text[0]);    
+            var messageData = {
+                    recipient: {
+                    id: event.sender.id
+                },
+                message: {
+                    text: response.output.text[0]
+                }
+            };
+            
+            sendMessageFacebook(messageData);    
         }
         
-        console.log('INFO: Iara: ' + response.output.text[0]);
+        //console.log('INFO: Iara: ' + response.output.text[0]);
       }
     });   
 }
 
-function callPerfumes(){
+function callPerfumes(senderId){
     request({
       uri: 'https://api.mlab.com/api/1/databases/testeiara/collections/products?apiKey=' + apiKey
     },
@@ -151,30 +140,67 @@ function callPerfumes(){
         console.log('Funcionou...')
         
         var json = JSON.parse(response.body);
-        
-        sendMessageFacebook(event.sender.id, 'Poderia ser o ' + json[0].name + ' - R$' + json[0].salePrice);
+        //sendMessageFacebook(event.sender.id, 'Poderia ser o ' + json[0].name + ' - R$' + json[0].salePrice);
+        sendGenericMessage(senderId, json);
       } else {
         console.log('Não Funcionou...')
         console.log(response.body);
       }
-    }); 
+    });
+}
+
+function sendGenericMessage(recipientId, products) {
+  var elements = products[0];
+
+  console.log(elements);
+
+  var messageData = {
+    recipient: {
+      id: recipientId
+    },
+    message: {
+      attachment: {
+        type: "template",
+        payload: {
+          template_type: "generic",
+          elements: elements
+        }
+      }
+    }
+  };  
+
+  sendMessageFacebook(messageData);
+}
+
+function getProductData(product) {
+  return {
+    title: product.name,
+    subtitle: product.description,
+    item_url: "https://www.natura.com/",               
+    image_url: product.imgUrl
+    // buttons: [{
+    //   type: "Comprar",
+    //   url: "https://www.natura.com/",
+    //   title: "Comprar agora"
+    // }]
+  };
 }
 
 function sendMessageFacebookWithImage(objResposta){
     
 }
 
-function sendMessageFacebook(recipientId, text){
-  var messageData = {
+function sendMessageFacebook(messageData){
+  /*var messageData = {
         recipient: {
           id: recipientId
         },
         message: {
           text: text
         }
-  };
+  };*/
   
-  console.log('INFO: Enviando mensagem (' + messageData.message.text + ')');
+  console.log(messageData);
   
   request({
     uri: 'https://graph.facebook.com/v2.6/me/messages',
@@ -183,6 +209,7 @@ function sendMessageFacebook(recipientId, text){
     json: messageData
   },
   function (error, response, body) {
+      console.log('response', response);
     if (!error /* && response.statusCode == 200 */) {
       var recipientId = body.recipient_id;
       var messageId = body.message_id;
