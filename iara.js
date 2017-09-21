@@ -150,10 +150,11 @@ function callPerfumes(senderId){
 }
 
 function sendGenericMessage(recipientId, products) {
-  var elements = products[0];
+  var product = products[0];
 
-  console.log(elements);
+  console.log(product);
 
+  /*
   var messageData = {
     recipient: {
       id: recipientId
@@ -167,7 +168,21 @@ function sendGenericMessage(recipientId, products) {
         }
       }
     }
-  };  
+  };*/
+  
+  var messageData = {
+    recipient: {
+      id: recipientId
+    },
+    message:{
+      attachment:{
+        type: "image",
+        payload:{
+          url: product.imgUrl
+        }
+      }
+    }
+  };
 
   sendMessageFacebook(messageData);
 }

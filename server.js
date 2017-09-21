@@ -104,6 +104,7 @@ function trataMensagem(event) {
         
         sendMessageFacebook(event.sender.id, 'Poderia ser o ' + json[0].name + ' - R$' + json[0].salePrice);
       } else {
+        
         console.log('Não Funcionou...')
         console.log(response.body);
       }
