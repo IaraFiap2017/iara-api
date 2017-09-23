@@ -8,7 +8,8 @@ var async = require('async');
 var socketio = require('socket.io');
 var express = require('express');
 var bodyParser = require("body-parser");
-var request = require('request')
+var request = require('request');
+var schedule = require('node-schedule');
 
 // AS VARIAVÉIS ABAIXO SÃO UTILIZADAS PARA QUE NOSSA APLICAÇÃO SEJA UM SERVIDOR HTTP
 var router = express();
@@ -133,6 +134,10 @@ function trataMensagem(event) {
               console.log("Intenção: Perfume");
               callPerfumes(event.sender.id);
           }
+          else if(event.message.text.includes('automatico')){
+              console.log('Enviando mensagem automatica');
+              sendAutomatizedMessage(event.sender.id, null);
+          }
           else if(respostaWatson == ""){
               
           }
@@ -164,6 +169,39 @@ function callPerfumes(senderId){
         console.log('Não Funcionou...');
       }
     });
+}
+
+function getProductsByCategory(category){
+  request({
+    uri: 'https://api.mlab.com/api/1/databases/testeiara/collections/products?q={"categories": ["' + category + '"]}&?apiKey' + apiKey
+  },
+  function (error, response, body){
+    if(!error && response.statusCode == 200){
+      console.log('Requisição ao MongoLab feita com sucesso...');
+      
+      var products = JSON.pasrse(response.body);
+    }
+    else{
+      console.log('Requisição fracassou');
+    }
+  }); 
+}
+
+function sendAutomatizedMessage(recipientId, messageData, days = '*', minutes = '*', seconds = '*'){
+  var startTime = new Date(Date.now() + 5000);
+  var endTime = new Date(startTime.getTime() + 10000);
+  var j = schedule.scheduleJob({ start: startTime, end: endTime, rule: '*/1 * * * * *' }, function(){
+    var messageDataAuto = {
+          recipient: {
+          id: recipientId
+      },
+      message: {
+          text: 'Oi estou em contato após 10 minutos...'
+      }
+    };
+    
+    sendMessageFacebook(messageDataAuto);
+  });
 }
 
 // FUNÇÃO TRATA O QUE SERÁ ENVIADO PARA O FACEBOOK
