@@ -128,24 +128,26 @@ function trataMensagem(event) {
         if(event.message.text != null && event.message.text != undefined){
           console.log('Event - não está nulo');
           
-          // A RESPOSTA QUE É ENVIADA DO WATSON CONVERSTAION INDICA UMA INTENÇÃO DA PESSOA QUE FALOU COM O CHATBOT
-          // ABAIXO OCORREM VALIDAÇÕES DESSA INTENÇÃO
-          if (respostaWatson == 'perfume'){
-              console.log("Intenção: Perfume");
-              callPerfumes(event.sender.id);
-              var products = sendProductsByCategory('Perfumaria');
-          }
-          else if(event.message.text.includes('automatico')){
-              console.log('Enviando mensagem automatica');
-              sendAutomatizedMessage(event.sender.id, null);
-          }
-          else if(respostaWatson == ""){
+          request({
+            uri: 'https://api.mlab.com/api/1/databases/testeiara/collections/products?q={"name": "' + response.output.text[0] + '"}}&apiKey=' + apiKey
+          },
+          function (error, response, body){
+            if(!error && response.statusCode == 200){
+              console.log('Requisição ao MongoLab feita com sucesso...');
               
-          }
-          // EM CASO DE NÃO HAVER NENHUMA INTENÇÃO SERÁ ENVIADA UMA MENSAGEM COM A RESPOSTA DO CONVERSATION SEM TRATAMENTO
-          else{
-              sendMessageFacebook(messageData);    
-          }
+              var products = JSON.parse(response.body);
+              
+              if(products.length > 0){
+                sendImageFacebook(event.sender.id, products);
+              }
+              else{
+                sendMessageFacebook(messageData);
+              }
+            }
+            else{
+              console.log('Requisição fracassou');
+            }
+          });  
         }
         else{
           console.log('Event - está nulo');
@@ -174,7 +176,7 @@ function callPerfumes(senderId){
 
 function sendProductsByCategory(recipientId, category){
   request({
-    uri: 'https://api.mlab.com/api/1/databases/testeiara/collections/products?q={"categories": ["' + category + '"]}&?apiKey' + apiKey
+    uri: 'https://api.mlab.com/api/1/databases/testeiara/collections/products?q={"categories": ["' + category + '"]}&apiKey=' + apiKey
   },
   function (error, response, body){
     if(!error && response.statusCode == 200){
@@ -187,6 +189,23 @@ function sendProductsByCategory(recipientId, category){
       console.log('Requisição fracassou');
     }
   }); 
+}
+
+function sendProductsByName(recipientId, name){
+  request({
+    uri: 'https://api.mlab.com/api/1/databases/testeiara/collections/products?q={"name": "' + name + '"}}&apiKey=' + apiKey
+  },
+  function (error, response, body){
+    if(!error && response.statusCode == 200){
+      console.log('Requisição ao MongoLab feita com sucesso...');
+      
+      var products = JSON.parse(response.body);
+      sendImageFacebook(recipientId, products);
+    }
+    else{
+      console.log('Requisição fracassou');
+    }
+  });
 }
 
 function sendAutomatizedMessage(recipientId, messageData, days = '*', minutes = '*', seconds = '*'){
@@ -229,7 +248,7 @@ function sendImageFacebook(recipientId, products) {
           id: recipientId
       },
       message: {
-          text: product.name + ' - R$'  + product.salePrice + '0'
+          text: product.name + ' - R$'  + product.salePrice + '0, só isso?'
       }
   };
   
