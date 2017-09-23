@@ -38,7 +38,11 @@ var userName = credentials.userWatson;
 var password = credentials.passWatson;
 var workspace = credentials.workspaceId;
 //var tokenFacebook = credentials.tokenFacebook;
-var tokenFacebook = 'EAAB5udtsgKsBAAeNOZCNQXAo8FbUisdZAnqRJ7fJK0QvVIXJjCXB4EoCl2mA8Wv8HUq6OP4RG4LhfE9zqkoZBxRyjZBVhfq6ZCo1NGuT5XKJA5sYRuig6zubV6CoKPHOfY7BN3idIXanUerKt8uBPTM77IMQTMVZBkOerbhF9FHKNUr43da7jpWRnrZBZAwiWEcZD';
+//var tokenFacebook = 'EAAB5udtsgKsBAAeNOZCNQXAo8FbUisdZAnqRJ7fJK0QvVIXJjCXB4EoCl2mA8Wv8HUq6OP4RG4LhfE9zqkoZBxRyjZBVhfq6ZCo1NGuT5XKJA5sYRuig6zubV6CoKPHOfY7BN3idIXanUerKt8uBPTM77IMQTMVZBkOerbhF9FHKNUr43da7jpWRnrZBZAwiWEcZD';
+
+// PÁGINA DO GUI
+var tokenFacebook = 'EAALihryr7BsBAMwFHP1BZCpDvMed1Da1XT1gejuYrOmtLC0FCgxIW78hfkXDylp2wF1ZBCRdR21YsqMxYJE94ZAGMXUnJPGHVPZCSrNpYFE59rYbDNhMgcb5yxKSG9lkJHV1wQK4UYr4kYR9TyxHWOzMLpenzXhkj6Jhl1ZBwhgZDZD';
+
 var token = 'projetoiarafiap';
 
 router.get('/webhook', function (req, res){
