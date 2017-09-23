@@ -133,6 +133,7 @@ function trataMensagem(event) {
           if (respostaWatson == 'perfume'){
               console.log("Intenção: Perfume");
               callPerfumes(event.sender.id);
+              var products = sendProductsByCategory('Perfumaria');
           }
           else if(event.message.text.includes('automatico')){
               console.log('Enviando mensagem automatica');
@@ -171,7 +172,7 @@ function callPerfumes(senderId){
     });
 }
 
-function getProductsByCategory(category){
+function sendProductsByCategory(recipientId, category){
   request({
     uri: 'https://api.mlab.com/api/1/databases/testeiara/collections/products?q={"categories": ["' + category + '"]}&?apiKey' + apiKey
   },
@@ -179,7 +180,8 @@ function getProductsByCategory(category){
     if(!error && response.statusCode == 200){
       console.log('Requisição ao MongoLab feita com sucesso...');
       
-      var products = JSON.pasrse(response.body);
+      var products = JSON.parse(response.body);
+      sendImageFacebook(recipientId, products);
     }
     else{
       console.log('Requisição fracassou');
@@ -254,7 +256,6 @@ function getProductData(product) {
 
 // ESSA FUNÇÃO ENVIA AS MENSAGENS AO FACEBOOK DESDE QUE RECEBA O PARAMETRO CORRETO
 function sendMessageFacebook(messageData){
-  
   console.log(messageData);
   
   request({

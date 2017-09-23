@@ -5,8 +5,9 @@ var express = require('express');
 //var path = require('path');
 var http = require('http');
 var socketio = require('socket.io');
+var watson = require('watson-developer-cloud');
 //var file = require('fs');
-//var watson = require('watson-developer-cloud');
+
 //var async = require('async');
 //var request = require('request';)
 
@@ -20,4 +21,10 @@ var server = http.createServer(app);
 var serverListener = socketio.listen(server);
 
 
-
+// chatbot wtson
+var iara = watson.conversation({
+  username: credentials.userName,
+  password: credentials.password,
+  version: 'v1',
+  version_date: '2017-05-26'
+});
