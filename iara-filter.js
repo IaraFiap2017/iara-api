@@ -1,5 +1,7 @@
-var doFilter = function(messages) {
-    return messages;
+
+
+var doFilter = function(message) {
+    return message;
 }
 
 

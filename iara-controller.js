@@ -26,7 +26,7 @@ app.post('/webhook', function(req, res){
     req.body.entry.forEach(function(e){
       e.messaging.forEach(function(event){
         if(event.message){
-          allMessages = allMessages + " " + event.message;
+          allMessages = allMessages + " " + event.message.text;
         }
       })
     });

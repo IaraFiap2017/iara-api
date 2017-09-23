@@ -143,6 +143,10 @@ function trataMensagem(event) {
               else{
                 sendMessageFacebook(messageData);
               }
+              
+              if(respostaWatson.includes('SÓ CLICAR')){
+                sendAutomatizedMessage(event.sender.id, null);
+              }
             }
             else{
               console.log('Requisição fracassou');
@@ -217,7 +221,7 @@ function sendAutomatizedMessage(recipientId, messageData, days = '*', minutes = 
           id: recipientId
       },
       message: {
-          text: 'Oi estou em contato após 10 minutos...'
+          text: 'Estou em contato seu produto deve ter acabado deseja mais?'
       }
     };
     
