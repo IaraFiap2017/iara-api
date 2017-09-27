@@ -1,42 +1,56 @@
+/* Server dependencies */
+const express = require('express');
+const bodyParser = require('body-parser');
+const http = require('http');
+const path = require('path');
+const request = require('request');
+const app = express();
+const server = http.createServer(app);
+
+
+/* Project dependencies */
 const credentials = require("./credentials-all");
 const iaraFilter = require("./iara-filter");
 
-// application server instance and config
-var express = require('express');
-var app = express();
+
+/* Config to receive the body on Facebook Messenger request */
+app.use(express.static(path.resolve(__dirname, 'client')));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 
-module.exports.app = app;
-
-
-// first facebook token verification (only one time request!)
+/* For Facebook Validation (only one time!) */
 app.get('/webhook', function (req, res){
-  if (req.query['hub.verify_token'] === credentials.tokenVerificacaoFacebook) {
-    res.send(req.query['hub.challenge']);
+  if (req.query['hub.mode'] === 'subscribe' && req.query['hub.verify_token'] === credentials.all.passFacebook) {
+      res.status(200).send(req.query['hub.challenge']);
+  } else {
+    res.sendStatus(403);    
   }
-  res.send('Erro de validação no token.');    
 });
 
 
-// facebook messages are received here
+/* Handling all messenges */
 app.post('/webhook', function(req, res){
-  var allMessages = ""
   
   if(req.body && req.body.object === 'page') {
-    req.body.entry.forEach(function(e){
-      e.messaging.forEach(function(event){
-        if(event.message){
-          allMessages = allMessages + " " + event.message.text;
+    req.body.entry.forEach(function(entry){
+      entry.messaging.forEach(function(event){
+        if(event.message && event.message.text){
+          console.log(event);
+          
+          iaraFilter.filters.doFilter(event.recipient.id, event.message.text);
         }
       })
     });
     
-    // if there is a message let's send it to filter
-    if(allMessages.length > 1) {
-      iaraFilter.doFilter(allMessages);     
-    }
+    /* success status to facebook */
+    res.status(200).end();
   }
-  
-  // success status to facebook is required
-  res.sendStatus(200);
+});
+
+
+/* Start http server */
+server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
+  var addr = server.address();
+  console.log("Chat server listening at", addr.address + ":" + addr.port);
 });
