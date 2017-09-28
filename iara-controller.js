@@ -3,7 +3,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const http = require('http');
 const path = require('path');
-const request = require('request');
 const app = express();
 const server = http.createServer(app);
 
@@ -35,10 +34,8 @@ app.post('/webhook', function(req, res){
   if(req.body && req.body.object === 'page') {
     req.body.entry.forEach(function(entry){
       entry.messaging.forEach(function(event){
-        if(event.message && event.message.text){
-          console.log(event);
-          
-          iaraFilter.filters.doFilter(event.recipient.id, event.message.text);
+        if(event.message && event.message.text && !event.message.is_echo){
+          iaraFilter.filters.doFilter(event.sender.id, event.message.text);
         }
       })
     });

@@ -23,7 +23,7 @@ router.use(bodyParser.urlencoded({ extended: true }));
 // AS CREDENCIAIS UTILIZADAS FICAM LOCALIZADAS EM UM ARQUIVO CHAMADO 'credentials.json'
 // NESSA LINHA CONVERTEMOS O ARQUIVO JSON EM UM OBJETO JSON
 var credentials = JSON.parse(file.readFileSync('credentials.json', 'utf-8'));
-
+// EAAa2lqCFHhIBAG7BtOtopKZAkjXdNricbFxk2ZCVDhZCN6H5QINQvwaIc6oNJcg7AjsXrSZAzvnR1pYHd9IlG5ZBtZCGXo9pivTvdKOB5sxVyl2xwC8w5Is4FRgqgbU0deA6pH1ZB77NKD6tzYjHZBB3oZAakJDmMC8Uz2FOVNSacEKNt82TOUZAxo
 // AQUI RETORNAMOS AS CREDENCIAIS EM VARIAVEIS QUE SERÃO UTILIZADAS POSTERIORMENTE
 var userName = credentials.userWatson;
 var password = credentials.passWatson;

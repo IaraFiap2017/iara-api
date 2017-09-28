@@ -1,7 +1,6 @@
 /* Project dependencies */
 const credentials = require("./credentials-all");
 const request = require('request');
-    
 
 var sendMessage = function(messageObject){
     request({
@@ -18,16 +17,32 @@ var sendMessage = function(messageObject){
   });
 }
 
+var getSenderUserInfo = function(senderId, callback){
+    request({
+        url: 'https://graph.facebook.com/v2.6/' + senderId + '?access_token=' + credentials.all.tokenFacebook,
+        method: 'GET'
+    }, function(error, response) {
+        if(!error && response.statusCode == 200){
+            callback(JSON.parse(response.body));
+        }
+        else{
+            console.log('ERROR :: ' + response);
+        }
+    });
+}
 
 var createSimpleMessageObject = function(senderId, message){
     var messageObject = {
-        recipient: { id: senderId},
-        message: {text: message}
+        recipient: { 
+            id: senderId
+        },
+        message: {
+            text: message
+        }
     }
     
     return messageObject
 }
-
 
 var createImageMessageObject = function(senderId, imageUrl){
     var messageObject = {
@@ -47,9 +62,9 @@ var createImageMessageObject = function(senderId, imageUrl){
     return messageObject;
 }
 
-
 module.exports.methods = {
     "sendMessage": sendMessage,
     "createSimpleMessageObject": createSimpleMessageObject,
-    "createImageMessageObject": createImageMessageObject
+    "createImageMessageObject": createImageMessageObject,
+    "getSenderUserInfo": getSenderUserInfo
 }

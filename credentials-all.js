@@ -1,5 +1,5 @@
 module.exports.all = {
-    "tokenFacebook" : "EAAa2lqCFHhIBAG7BtOtopKZAkjXdNricbFxk2ZCVDhZCN6H5QINQvwaIc6oNJcg7AjsXrSZAzvnR1pYHd9IlG5ZBtZCGXo9pivTvdKOB5sxVyl2xwC8w5Is4FRgqgbU0deA6pH1ZB77NKD6tzYjHZBB3oZAakJDmMC8Uz2FOVNSacEKNt82TOUZAxo",
+    "tokenFacebook" : "EAALihryr7BsBAGGrp3n0tUZB0QVKpfENrMMLHZCy75IaZCYf6nERZA0vGQ7wLigHvTQDNrkeYZCBtewLVRdwSXRsxdpCWz0bZA3HwrOgAdeo18Aw7wbD4FZA2WvgXY0jMhAm78VzmBJJW5Pj2ZCno6gfEEdMHDDL644ChfN8IzrRmtY0qfTZCWQf0",
     "passFacebook": "projetoiara3055",
     "userWatson" : "e8b87160-0456-4ebc-aa4d-0a065f755882",
     "passWatson" : "cE5NOcp1Un3B",

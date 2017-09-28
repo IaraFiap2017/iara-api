@@ -11,7 +11,6 @@ var iara = watson.conversation({
 
 
 var sendToWatson = function(message, callback) {
-
   iara.message({
       workspace_id: credentials.all.workspaceId,
       input: { 'text': message },
