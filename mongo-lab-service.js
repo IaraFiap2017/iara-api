@@ -1,13 +1,11 @@
 const credentials = require("./credentials-all");
 var request = require('request');
 
-
 var queryAllCategories = function() {
   
   // TODO buscar realmente todas as categorias
   return ["Perfumaria", "Barba"];
 }
-
 
 var queryProductByName = function(name, callback) {
   request({
@@ -20,7 +18,6 @@ var queryProductByName = function(name, callback) {
     }
   }); 
 }
-
 
 var queryProductByCategory = function(category, callback) {
   request({
