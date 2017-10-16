@@ -31,6 +31,40 @@ var getSenderUserInfo = function(senderId, callback){
     });
 }
 
+var createComboMessageObject = function(senderId, product) {
+    var price = 'R$ ' + product.salePrice.toFixed(2).toString().replace('.', ',');
+    var messageData = {
+        recipient: {
+            id: senderId
+        },
+        message: {
+            attachment: {
+                type: "template",
+                payload: {
+                    template_type: "generic",
+                    elements: [{
+                        title: product.name,
+                        subtitle: price,
+                        item_url: "http://www.natura.com.br",
+                        image_url: product.imgUrl,
+                        buttons: [{
+                            type: "web_url",
+                            url: "http://www.natura.com.br",
+                            title: "Ver Detalhes"
+                        }, {
+                            type: "web_url",
+                            url: "http://www.natura.com.br",
+                            title: "Comprar Agora"
+                        }],
+                    }]
+                }
+            }
+        }
+    };
+    
+    return messageData;
+}
+
 var createSimpleMessageObject = function(senderId, message){
     var messageObject = {
         recipient: { 
@@ -66,5 +100,6 @@ module.exports.methods = {
     "sendMessage": sendMessage,
     "createSimpleMessageObject": createSimpleMessageObject,
     "createImageMessageObject": createImageMessageObject,
-    "getSenderUserInfo": getSenderUserInfo
+    "createComboMessageObject": createComboMessageObject,
+    "getSenderUserInfo": getSenderUserInfo,
 }
