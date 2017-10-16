@@ -32,7 +32,7 @@ var getSenderUserInfo = function(senderId, callback){
 }
 
 var createComboMessageObject = function(senderId, product) {
-    var price = 'R$ ' + product.salePrice.toFixed(2).toString().replace('.', ',');
+    
     var messageData = {
         recipient: {
             id: senderId
@@ -44,7 +44,7 @@ var createComboMessageObject = function(senderId, product) {
                     template_type: "generic",
                     elements: [{
                         title: product.name,
-                        subtitle: price,
+                        subtitle: formataPreco(product.salePrice),
                         item_url: "http://www.natura.com.br",
                         image_url: product.imgUrl,
                         buttons: [{
@@ -63,6 +63,10 @@ var createComboMessageObject = function(senderId, product) {
     };
     
     return messageData;
+}
+
+function formataPreco(price) {
+    return 'R$ ' + price.toFixed(2).toString().replace('.', ',');
 }
 
 var createSimpleMessageObject = function(senderId, message){

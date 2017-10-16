@@ -51,7 +51,6 @@ app.post('/webhook', function(req, res){
   if(req.body && req.body.object === 'page') {
     req.body.entry.forEach(function(entry){
       entry.messaging.forEach(function(event){
-        
         if(event.message && event.message.text && !event.message.is_echo){
           iaraFilter.filters.doFilter(event.sender.id, event.message.text, null);
         }

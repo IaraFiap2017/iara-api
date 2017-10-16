@@ -45,11 +45,13 @@ var doFilter = function (senderId, message, listProducts) {
             mongoService.methods.queryProductByName(response, function(products){
                 if(products.length > 0){
                     if(products[0]){
+                        var messageData = facebookService.methods.createSimpleMessageObject(senderId, 'Só isso?');
                         var comboMessageData = facebookService.methods.createComboMessageObject(senderId, products[0]);
                         facebookService.methods.sendMessage(comboMessageData);
+                        facebookService.methods.sendMessage(messageData);
                     }
                     
-                } else if (message.includes('Pode sim') || message.includes('pode sim')){
+                } else if (message.includes('Pode sim') || message.includes('pode sim') || message.includes('Quero sim') || message.includes('quero sim')){
                     var prod = 'Shampoo Anticaspa Natura Homem - 300ml';
                     
                     mongoService.methods.queryProductByName(prod, function(products){
