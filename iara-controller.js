@@ -28,8 +28,8 @@ app.get('/webhook', function (req, res){
 });
 
 
-var lista1 = ['Desodorante Colônia Natura Homem Madeiras 100 ml', 'Gel Fixador Para Cabelos Natura Homem - 100g', 'Espuma de Barbear Natura Homem - 180g / 200ml']
-var lista2 = ['Deo Parfum Essencial Masculino - 100ml', 'Espuma de Barbear Natura Homem - 180g / 200ml', 'Sabonete em Barra Cremoso e Refrescante Natura Homem - 3 un de 110g cada']
+var lista1 = ['Óleo Fortalecedor Ekos Patauá - 100ml', 'Sabonete em Barra Puro Vegetal Sortido - 4 un de 100g cada', 'Desodorante Colônia Feminino Luna - 75ml']
+var lista2 = ['Desodorante Colônia Feminino Luna - 75ml', 'Desodorante Colônia Feminino Luna - 75ml', 'Óleo Fortalecedor Ekos Patauá - 100ml']
 var lista3 = ['Sabonete em Barra Puro Vegetal Sortido - 4 un de 100g cada', 'Óleo Fortalecedor Ekos Patauá - 100ml', 'Desodorante Colônia Feminino Luna - 75ml']
 var contador = 1;
 var listas = [lista1, lista2, lista3]
