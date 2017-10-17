@@ -31,9 +31,22 @@ var queryProductByCategory = function(category, callback) {
   }); 
 }
 
+var queryProductById = function(id, callback){
+  request({
+    uri: 'https://api.mlab.com/api/1/databases/testeiara/collections/products?q={"productId":' + id + '}&apiKey=' + credentials.all.apiKeyMongoLab},
+  function (error, response, body){
+    if(!error && response.statusCode == 200){
+      callback(JSON.parse(response.body));
+    } else {
+      console.log('queryProductByCategory failed!');
+    }
+  }); 
+}
+
 
 module.exports.methods = {
   "queryAllCategories": queryAllCategories,
   "queryProductByName": queryProductByName,
-  "queryProductByCategory": queryProductByCategory
+  "queryProductByCategory": queryProductByCategory,
+  "queryProductById": queryProductById
 }

@@ -9,7 +9,7 @@ const server = http.createServer(app);
 
 /* Project dependencies */
 const credentials = require("./credentials-all");
-const iaraFilter = require("./iara-filter");
+const iaraFilter = require("./iara-filter2");
 
 
 /* Config to receive the body on Facebook Messenger request */
@@ -51,6 +51,7 @@ app.post('/webhook', function(req, res){
   if(req.body && req.body.object === 'page') {
     req.body.entry.forEach(function(entry){
       entry.messaging.forEach(function(event){
+        console.log(event);
         if(event.message && event.message.text && !event.message.is_echo){
           iaraFilter.filters.doFilter(event.sender.id, event.message.text, null);
         }

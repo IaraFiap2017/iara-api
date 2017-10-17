@@ -33,19 +33,33 @@ var lookForCategories = function(message) {
         podemos agora com tudo funcionando pensar em armazenar o id do chat do usuário e sua última consulta ou algo do tipo...
 */
 var doFilter = function (senderId, message, listProducts) {
+    console.log(message);
+    
     if(message == 'imagem'){
         //var waitMessageData = facebookService.methods.createSimpleMessageObject(senderId, "Aguarde um momento, por favor.");
         //facebookService.methods.sendMessage(waitMessageData);
         
             mongoService.methods.queryProductById(56143, function(products) {
-            console.log(products[0]);
             
             if(products[0]){
                 var comboMessageData = facebookService.methods.createComboMessageObject(senderId, products[0]);    
                 facebookService.methods.sendMessage(comboMessageData);
             }
         });
-    } else {
+    } 
+    else if(message.includes('Ok') || message.includes('ok')){
+        var imgUrl = 'https://pbs.twimg.com/media/DMXoxisWkAA-8qW.jpg:large';
+        var messageDataImage = facebookService.methods.createImageMessageObject(senderId, imgUrl);
+        
+        facebookService.methods.sendMessage(messageDataImage);
+    }
+    else if(message.includes('C01')){
+        var text = 'Parabens voce ganhou +1 ponto';
+        var messageDataSimple = facebookService.methods.createSimpleMessageObject(senderId, text);
+        
+        facebookService.methods.sendMessage(messageDataSimple);
+    }
+    else {
         if(message.includes('desodorante') || message.includes('Desodorante')){
             var nameProduct = 'Desodorante Antitranspirante Roll-on Natura Homem - 75 ml';
             mongoService.methods.queryProductByName(nameProduct, function(products){
@@ -100,6 +114,7 @@ function sendAutomatizedMessage(recipientId, firstName, product){
   var endTime = new Date(startTime.getTime() + 1000);
   var j = schedule.scheduleJob({ start: startTime, end: endTime, rule: '*/1 * * * * *' }, function(){
     var text = 'Olá ' + firstName + ' estou em contato porque seu Desodorante Antitranspirante Roll-on Natura Homem - 75 ml , deve ter acabado deseja mais?';
+    var newText = 'Faca o descarte consciente e acomule pontos para novos produtos';
     
     var messageData = facebookService.methods.createSimpleMessageObject(recipientId, text);
     facebookService.methods.sendMessage(messageData);
